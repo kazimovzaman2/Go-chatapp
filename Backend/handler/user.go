@@ -21,27 +21,38 @@ func GetAllUsers(c *fiber.Ctx) error {
 	db := database.DB
 	var users []model.User
 	db.Find(&users)
-
-	// Create a new slice to hold the desired user fields
 	var responseData []model.UserResponse
 
-	// Iterate through each user and map the desired fields
 	for _, user := range users {
-		userData := model.UserResponse{
-			ID:           user.ID,
-			Email:        user.Email,
-			FirstName:    user.FirstName,
-			LastName:     user.LastName,
-			ProfileImage: user.ProfileImage,
-			CreatedAt:    user.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt:    user.UpdatedAt.Format("2006-01-02 15:04:05"),
-		}
-		responseData = append(responseData, userData)
+		responseData = append(responseData, utils.UserToResponse(user))
 	}
 
 	return c.JSON(fiber.Map{
 		"status":  "success",
 		"message": "All users",
+		"data":    responseData,
+	})
+}
+
+func GetUser(c *fiber.Ctx) error {
+	id := c.Params("id")
+	db := database.DB
+	var user model.User
+
+	db.Find(&user, id)
+	if user.ID == 0 || user.Email == "" {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"status":  "error",
+			"message": "User not found",
+			"errors":  "User not found",
+		})
+	}
+
+	responseData := utils.UserToResponse(user)
+
+	return c.JSON(fiber.Map{
+		"status":  "success",
+		"message": "User found",
 		"data":    responseData,
 	})
 }
