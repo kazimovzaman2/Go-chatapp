@@ -27,4 +27,4 @@ jobs:
         
     - name: Build
       working-directory: ./Backend
-      run: go builds
+      run: go build
