@@ -22,4 +22,4 @@ go.work
 
 # Media files
 
-media/avatars/
+Backend/media/avatars/*
