@@ -29,3 +29,17 @@ func SaveBase64Image(imageData string) (string, error) {
 
 	return imagePath, nil
 }
+
+func IsBase64(imageData string) bool {
+	imageSlice := []string{"data:@image/", "data:@file/", "data:image/", "data:file/"}
+	var hasPrefix bool
+
+	for _, v := range imageSlice {
+		if strings.HasPrefix(imageData, v) {
+			hasPrefix = true
+			break
+		}
+	}
+
+	return hasPrefix
+}

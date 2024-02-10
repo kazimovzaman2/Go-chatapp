@@ -2,7 +2,8 @@ package handler
 
 import (
 	"fmt"
-	"strings"
+	"os"
+	"path/filepath"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -31,30 +32,6 @@ func GetAllUsers(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(model.SuccessResponse{
 		Status:  "success",
 		Message: "All users",
-		Data:    responseData,
-	})
-}
-
-func GetMe(c *fiber.Ctx) error {
-	user_claim := c.Locals("user").(*jwt.Token)
-	claims := user_claim.Claims.(jwt.MapClaims)
-	email := claims["email"].(string)
-
-	db := database.DB
-	var user model.User
-	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(model.ErrorResponse{
-			Status:  "error",
-			Message: "User not found",
-			Errors:  err.Error(),
-		})
-	}
-
-	responseData := utils.UserToResponse(user)
-
-	return c.Status(fiber.StatusOK).JSON(model.SuccessResponse{
-		Status:  "success",
-		Message: "User found",
 		Data:    responseData,
 	})
 }
@@ -123,7 +100,7 @@ func CreateUser(c *fiber.Ctx) error {
 	}
 
 	// Save profile image
-	if strings.HasPrefix(user.ProfileImage, "data:@image/") || strings.HasPrefix(user.ProfileImage, "data:@file/") {
+	if utils.IsBase64(user.ProfileImage) {
 		imagePath, err := utils.SaveBase64Image(user.ProfileImage)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(model.ErrorResponse{
@@ -168,5 +145,129 @@ func CreateUser(c *fiber.Ctx) error {
 		Status:  "success",
 		Message: "User created",
 		Data:    newUser,
+	})
+}
+
+func GetMe(c *fiber.Ctx) error {
+	user_claim := c.Locals("user").(*jwt.Token)
+	claims := user_claim.Claims.(jwt.MapClaims)
+	email := claims["email"].(string)
+
+	db := database.DB
+	var user model.User
+	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "User not found",
+			Errors:  err.Error(),
+		})
+	}
+
+	responseData := utils.UserToResponse(user)
+
+	return c.Status(fiber.StatusOK).JSON(model.SuccessResponse{
+		Status:  "success",
+		Message: "User found",
+		Data:    responseData,
+	})
+}
+
+func UpdateMe(c *fiber.Ctx) error {
+	user_claim := c.Locals("user").(*jwt.Token)
+	claims := user_claim.Claims.(jwt.MapClaims)
+	email := claims["email"].(string)
+
+	db := database.DB
+	var user model.User
+	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "User not found",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Parse request body into user struct
+	if err := c.BodyParser(&user); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "Couldn't parse request body",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Save profile image
+	if utils.IsBase64(user.ProfileImage) {
+		imagePath, err := utils.SaveBase64Image(user.ProfileImage)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(model.ErrorResponse{
+				Status:  "error",
+				Message: "Couldn't save profile image",
+				Errors:  err.Error(),
+			})
+		}
+
+		user.ProfileImage = fmt.Sprintf("http://localhost:8000/%s", imagePath)
+	}
+
+	// Update user
+	if err := db.Save(&user).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "Couldn't update user",
+			Errors:  err.Error(),
+		})
+	}
+
+	responseData := utils.UserToResponse(user)
+
+	return c.Status(fiber.StatusOK).JSON(model.SuccessResponse{
+		Status:  "success",
+		Message: "User updated",
+		Data:    responseData,
+	})
+}
+
+func DeleteMe(c *fiber.Ctx) error {
+	user_claim := c.Locals("user").(*jwt.Token)
+	claims := user_claim.Claims.(jwt.MapClaims)
+	email := claims["email"].(string)
+
+	db := database.DB
+	var user model.User
+	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "User not found",
+			Errors:  err.Error(),
+		})
+	}
+
+	imagePath := user.ProfileImage
+
+	if err := db.Unscoped().Delete(&user).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "Couldn't delete user",
+			Errors:  err.Error(),
+		})
+	}
+
+	if imagePath != "" {
+		filename := filepath.Base(imagePath)
+		err := os.Remove(filepath.Join("./media/avatars", filename))
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(model.ErrorResponse{
+				Status:  "error",
+				Message: "Couldn't delete profile image",
+				Errors:  err.Error(),
+			})
+		}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(model.SuccessResponse{
+		Status:  "success",
+		Message: "User deleted",
+		Data:    nil,
 	})
 }
