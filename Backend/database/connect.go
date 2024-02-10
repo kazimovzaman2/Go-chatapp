@@ -10,9 +10,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func ConnectDB() {
+func ConnectDB(config *config.Config) {
 	var err error
-	p := config.Config("DB_PORT")
+	p := config.DBPort
 	port, err := strconv.ParseUint(p, 10, 32)
 
 	if err != nil {
@@ -21,11 +21,11 @@ func ConnectDB() {
 
 	dns := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		config.Config("DB_HOST"),
+		config.DBHost,
 		port,
-		config.Config("DB_USER"),
-		config.Config("DB_PASSWORD"),
-		config.Config("DB_NAME"),
+		config.DBUserName,
+		config.DBUserPassword,
+		config.DBName,
 	)
 	DB, err = gorm.Open(postgres.Open(dns), &gorm.Config{})
 

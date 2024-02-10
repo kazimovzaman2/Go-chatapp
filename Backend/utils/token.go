@@ -9,12 +9,15 @@ import (
 )
 
 func GenerateAccessToken(user model.User) (string, error) {
+	config, _ := config.LoadConfig(".")
 	token := jwt.New(jwt.SigningMethodHS256)
+
 	claims := token.Claims.(jwt.MapClaims)
 	claims["email"] = user.Email
 	claims["id"] = user.ID
 	claims["exp"] = time.Now().Add(time.Second * 15).Unix()
-	accessToken, err := token.SignedString([]byte(config.JWTAccessSecret))
+
+	accessToken, err := token.SignedString([]byte(config.JwtAccessSecret))
 	if err != nil {
 		return "", err
 	}
@@ -22,12 +25,15 @@ func GenerateAccessToken(user model.User) (string, error) {
 }
 
 func GenerateRefreshToken(user model.User) (string, error) {
+	config, _ := config.LoadConfig(".")
 	token := jwt.New(jwt.SigningMethodHS256)
+
 	claims := token.Claims.(jwt.MapClaims)
 	claims["email"] = user.Email
 	claims["id"] = user.ID
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-	accessToken, err := token.SignedString([]byte(config.JWTRefreshSecret))
+
+	accessToken, err := token.SignedString([]byte(config.JwtRefreshSecret))
 	if err != nil {
 		return "", err
 	}

@@ -91,8 +91,9 @@ func RefreshToken(c *fiber.Ctx) error {
 		})
 	}
 
+	config, _ := config.LoadConfig(".")
 	token, err := jwt.Parse(input.RefreshToken, func(token *jwt.Token) (interface{}, error) {
-		return []byte(config.JWTRefreshSecret), nil
+		return []byte(config.JwtRefreshSecret), nil
 	})
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(model.ErrorResponse{
