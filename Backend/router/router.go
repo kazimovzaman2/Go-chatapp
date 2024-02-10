@@ -2,7 +2,6 @@ package router
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/kazimovzaman2/Go-chatapp/config"
 	"github.com/kazimovzaman2/Go-chatapp/handler"
 	"github.com/kazimovzaman2/Go-chatapp/middleware"
@@ -12,7 +11,7 @@ func SetupRoutes(app *fiber.App) {
 	config, _ := config.LoadConfig(".")
 	protected := middleware.NewAuthMiddleware(config.JwtAccessSecret)
 
-	api := app.Group("/api", logger.New())
+	api := app.Group("/api")
 	api.Get("/hello/", handler.Hello)
 
 	auth := api.Group("/jwt")
