@@ -133,6 +133,15 @@ func CreateUser(c *fiber.Ctx) error {
 		})
 	}
 
+	accessToken, refreshToken, err := generateTokens(*user)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "Could not login",
+			Errors:  err.Error(),
+		})
+	}
+
 	// Create a new user response
 	newUser := NewUser{
 		Email:        user.Email,
@@ -144,7 +153,11 @@ func CreateUser(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(model.SuccessResponse{
 		Status:  "success",
 		Message: "User created",
-		Data:    newUser,
+		Data: fiber.Map{
+			"user":          newUser,
+			"access_token":  accessToken,
+			"refresh_token": refreshToken,
+		},
 	})
 }
 
