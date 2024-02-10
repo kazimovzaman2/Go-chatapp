@@ -18,8 +18,8 @@ func main() {
 	})
 
 	database.ConnectDB()
+	app.Static("/media/avatars", "./media/avatars")
 
 	router.SetupRoutes(app)
-	app.Static("/media/avatars", "./media/avatars")
 	log.Fatal(app.Listen(":8000"))
 }

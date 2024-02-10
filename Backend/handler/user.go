@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/kazimovzaman2/Go-chatapp/database"
 	"github.com/kazimovzaman2/Go-chatapp/model"
 	"github.com/kazimovzaman2/Go-chatapp/utils"
@@ -30,6 +31,30 @@ func GetAllUsers(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"status":  "success",
 		"message": "All users",
+		"data":    responseData,
+	})
+}
+
+func GetMe(c *fiber.Ctx) error {
+	user_claim := c.Locals("user").(*jwt.Token)
+	claims := user_claim.Claims.(jwt.MapClaims)
+	email := claims["email"].(string)
+
+	db := database.DB
+	var user model.User
+	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"status":  "error",
+			"message": "User not found",
+			"errors":  "User not found",
+		})
+	}
+
+	responseData := utils.UserToResponse(user)
+
+	return c.JSON(fiber.Map{
+		"status":  "success",
+		"message": "User found",
 		"data":    responseData,
 	})
 }
