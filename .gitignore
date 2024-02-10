@@ -21,5 +21,7 @@
 go.work
 
 # Media files
-
 Backend/media/avatars/*
+
+# Environment varaibles
+.env
