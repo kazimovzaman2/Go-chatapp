@@ -15,61 +15,66 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
+func generateTokens(user model.User) (string, string, error) {
+	accessToken, err := utils.GenerateAccessToken(user)
+	if err != nil {
+		return "", "", err
+	}
+	refreshToken, err := utils.GenerateRefreshToken(user)
+	if err != nil {
+		return "", "", err
+	}
+	return accessToken, refreshToken, nil
+}
+
 func Login(c *fiber.Ctx) error {
 	db := database.DB
 	var user model.User
 
 	var input model.LoginInput
 	if err := c.BodyParser(&input); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Invalid input",
-			"errors":  err.Error(),
+		return c.Status(fiber.StatusBadRequest).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "Invalid input",
+			Errors:  err.Error(),
 		})
 	}
 
 	if err := db.Where("email = ?", input.Email).First(&user).Error; err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"status":  "error",
-			"message": "User not found",
-			"errors":  "User not found",
+		return c.Status(fiber.StatusNotFound).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "User not found",
+			Errors:  err.Error(),
 		})
 	}
 
 	if !CheckPasswordHash(input.Password, user.Password) {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Invalid password",
-			"errors":  "Invalid password",
+		return c.Status(fiber.StatusUnauthorized).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "The password is incorrect",
+			Errors:  "Invalid password",
 		})
 	}
 
-	accessToken, err := utils.GenerateAccessToken(user)
+	accessToken, refreshToken, err := generateTokens(user)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Could not login",
-			"errors":  err.Error(),
+		return c.Status(fiber.StatusInternalServerError).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "Could not login",
+			Errors:  err.Error(),
 		})
 	}
 
-	refreshToken, err := utils.GenerateRefreshToken(user)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Could not login",
-			"errors":  err.Error(),
-		})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"status":  "success",
-		"message": "Logged in",
-		"data": fiber.Map{
+	successResp := model.SuccessResponse{
+		Status:  "success",
+		Message: "Logged in",
+		Data: fiber.Map{
 			"access_token":  accessToken,
 			"refresh_token": refreshToken,
 		},
-	})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(successResp)
 }
 
 func RefreshToken(c *fiber.Ctx) error {
@@ -79,10 +84,10 @@ func RefreshToken(c *fiber.Ctx) error {
 
 	var input RefreshTokenInput
 	if err := c.BodyParser(&input); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Invalid input",
-			"errors":  err.Error(),
+		return c.Status(fiber.StatusBadRequest).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "Invalid input",
+			Errors:  err.Error(),
 		})
 	}
 
@@ -90,19 +95,19 @@ func RefreshToken(c *fiber.Ctx) error {
 		return []byte(config.JWTSecret), nil
 	})
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Invalid token",
-			"errors":  err.Error(),
+		return c.Status(fiber.StatusUnauthorized).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "Invalid token",
+			Errors:  err.Error(),
 		})
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Invalid token",
-			"errors":  "Invalid token",
+		return c.Status(fiber.StatusUnauthorized).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "The token is invalid",
+			Errors:  "Invalid token",
 		})
 	}
 
@@ -110,37 +115,30 @@ func RefreshToken(c *fiber.Ctx) error {
 	userID := claims["id"].(float64)
 	var user model.User
 	if err := db.Where("id = ?", userID).First(&user).Error; err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"status":  "error",
-			"message": "User not found",
-			"errors":  "User not found",
+		return c.Status(fiber.StatusNotFound).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "User not found",
+			Errors:  err.Error(),
 		})
 	}
 
-	accessToken, err := utils.GenerateAccessToken(user)
+	accessToken, refreshToken, err := generateTokens(user)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Could not refresh token",
-			"errors":  err.Error(),
+		return c.Status(fiber.StatusInternalServerError).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "Could not refresh token",
+			Errors:  err.Error(),
 		})
 	}
 
-	refreshToken, err := utils.GenerateRefreshToken(user)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Could not login",
-			"errors":  err.Error(),
-		})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"status":  "success",
-		"message": "Token refreshed",
-		"data": fiber.Map{
+	successResp := model.SuccessResponse{
+		Status:  "success",
+		Message: "Token refreshed",
+		Data: fiber.Map{
 			"access_token":  accessToken,
 			"refresh_token": refreshToken,
 		},
-	})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(successResp)
 }

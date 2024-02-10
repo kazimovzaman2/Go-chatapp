@@ -3,6 +3,7 @@ package middleware
 import (
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/kazimovzaman2/Go-chatapp/model"
 )
 
 func NewAuthMiddleware(secret string) fiber.Handler {
@@ -13,16 +14,9 @@ func NewAuthMiddleware(secret string) fiber.Handler {
 }
 
 func jwtError(c *fiber.Ctx, err error) error {
-	if err.Error() == "Missing or malformed JWT" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Missing or malformed JWT",
-			"data":    nil,
-		})
-	}
-	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-		"status":  "error",
-		"message": "Invalid or expired JWT",
-		"data":    nil,
+	return c.Status(fiber.StatusUnauthorized).JSON(model.ErrorResponse{
+		Status:  "error",
+		Message: "Unauthorized",
+		Errors:  err.Error(),
 	})
 }

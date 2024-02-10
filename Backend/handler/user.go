@@ -28,10 +28,10 @@ func GetAllUsers(c *fiber.Ctx) error {
 		responseData = append(responseData, utils.UserToResponse(user))
 	}
 
-	return c.JSON(fiber.Map{
-		"status":  "success",
-		"message": "All users",
-		"data":    responseData,
+	return c.Status(fiber.StatusOK).JSON(model.SuccessResponse{
+		Status:  "success",
+		Message: "All users",
+		Data:    responseData,
 	})
 }
 
@@ -43,19 +43,19 @@ func GetMe(c *fiber.Ctx) error {
 	db := database.DB
 	var user model.User
 	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"status":  "error",
-			"message": "User not found",
-			"errors":  "User not found",
+		return c.Status(fiber.StatusNotFound).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "User not found",
+			Errors:  err.Error(),
 		})
 	}
 
 	responseData := utils.UserToResponse(user)
 
-	return c.JSON(fiber.Map{
-		"status":  "success",
-		"message": "User found",
-		"data":    responseData,
+	return c.Status(fiber.StatusOK).JSON(model.SuccessResponse{
+		Status:  "success",
+		Message: "User found",
+		Data:    responseData,
 	})
 }
 
@@ -66,19 +66,19 @@ func GetUser(c *fiber.Ctx) error {
 
 	db.Find(&user, id)
 	if user.ID == 0 || user.Email == "" {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"status":  "error",
-			"message": "User not found",
-			"errors":  "User not found",
+		return c.Status(fiber.StatusNotFound).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "User with the provided ID not found",
+			Errors:  "User not found",
 		})
 	}
 
 	responseData := utils.UserToResponse(user)
 
-	return c.JSON(fiber.Map{
-		"status":  "success",
-		"message": "User found",
-		"data":    responseData,
+	return c.Status(fiber.StatusOK).JSON(model.SuccessResponse{
+		Status:  "success",
+		Message: "User found",
+		Data:    responseData,
 	})
 }
 
@@ -95,29 +95,30 @@ func CreateUser(c *fiber.Ctx) error {
 
 	// Parse request body into user struct
 	if err := c.BodyParser(user); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Review your input",
-			"errors":  err.Error(),
+		return c.Status(fiber.StatusInternalServerError).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "Couldn't parse request body",
+			Errors:  err.Error(),
 		})
 	}
 
 	// Validate request body
 	validate := validator.New()
 	if err := validate.Struct(user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid request body",
-			"errors":  err.Error(),
+		return c.Status(fiber.StatusBadRequest).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "Invalid input",
+			Errors:  err.Error(),
 		})
 	}
 
 	// Check if email already exists
 	existingUser := new(model.User)
 	if err := db.Where("email = ?", user.Email).First(existingUser).Error; err == nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":  "error",
-			"message": "A user with the provided email already exists",
-			"errors":  "Email already exists",
+		return c.Status(fiber.StatusBadRequest).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "User with this email already exists",
+			Errors:  "Email already exists",
 		})
 	}
 
@@ -125,9 +126,10 @@ func CreateUser(c *fiber.Ctx) error {
 	if strings.HasPrefix(user.ProfileImage, "data:@image/") || strings.HasPrefix(user.ProfileImage, "data:@file/") {
 		imagePath, err := utils.SaveBase64Image(user.ProfileImage)
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"message": "Error saving image",
-				"errors":  err.Error(),
+			return c.Status(fiber.StatusInternalServerError).JSON(model.ErrorResponse{
+				Status:  "error",
+				Message: "Couldn't save profile image",
+				Errors:  err.Error(),
 			})
 		}
 
@@ -137,20 +139,20 @@ func CreateUser(c *fiber.Ctx) error {
 	// Hash password
 	hash, err := hashPassword(user.Password)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Couldn't hash password",
-			"errors":  err.Error(),
+		return c.Status(fiber.StatusInternalServerError).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "Couldn't hash password",
+			Errors:  err.Error(),
 		})
 	}
 	user.Password = hash
 
 	// Create user
 	if err := db.Create(&user).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"status":  "error",
-			"message": "Couldn't create user",
-			"errors":  err.Error(),
+		return c.Status(fiber.StatusInternalServerError).JSON(model.ErrorResponse{
+			Status:  "error",
+			Message: "Couldn't create user",
+			Errors:  err.Error(),
 		})
 	}
 
@@ -162,9 +164,9 @@ func CreateUser(c *fiber.Ctx) error {
 		ProfileImage: user.ProfileImage,
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"status":  "success",
-		"message": "Created user",
-		"data":    newUser,
+	return c.Status(fiber.StatusCreated).JSON(model.SuccessResponse{
+		Status:  "success",
+		Message: "User created",
+		Data:    newUser,
 	})
 }
