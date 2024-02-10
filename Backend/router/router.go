@@ -9,7 +9,7 @@ import (
 )
 
 func SetupRoutes(app *fiber.App) {
-	protected := middleware.NewAuthMiddleware(config.JWTSecret)
+	protected := middleware.NewAuthMiddleware(config.JWTAccessSecret)
 
 	api := app.Group("/api", logger.New())
 	api.Get("/hello/", handler.Hello)

@@ -14,7 +14,7 @@ func GenerateAccessToken(user model.User) (string, error) {
 	claims["email"] = user.Email
 	claims["id"] = user.ID
 	claims["exp"] = time.Now().Add(time.Second * 15).Unix()
-	accessToken, err := token.SignedString([]byte(config.JWTSecret))
+	accessToken, err := token.SignedString([]byte(config.JWTAccessSecret))
 	if err != nil {
 		return "", err
 	}
@@ -27,7 +27,7 @@ func GenerateRefreshToken(user model.User) (string, error) {
 	claims["email"] = user.Email
 	claims["id"] = user.ID
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-	accessToken, err := token.SignedString([]byte(config.JWTSecret))
+	accessToken, err := token.SignedString([]byte(config.JWTRefreshSecret))
 	if err != nil {
 		return "", err
 	}

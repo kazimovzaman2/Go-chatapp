@@ -15,4 +15,5 @@ func Config(key string) string {
 	return os.Getenv(key)
 }
 
-var JWTSecret = Config("JWT_SECRET")
+var JWTAccessSecret = Config("JWT_ACCESS_SECRET")
+var JWTRefreshSecret = Config("JWT_REFRESH_SECRET")
