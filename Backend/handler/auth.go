@@ -1,45 +1,18 @@
 package handler
 
 import (
-	"time"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/kazimovzaman2/Go-chatapp/config"
 	"github.com/kazimovzaman2/Go-chatapp/database"
 	"github.com/kazimovzaman2/Go-chatapp/model"
+	"github.com/kazimovzaman2/Go-chatapp/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
-}
-
-func generateAccessToken(user model.User) (string, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-	claims["email"] = user.Email
-	claims["id"] = user.ID
-	claims["exp"] = time.Now().Add(time.Second * 15).Unix()
-	accessToken, err := token.SignedString([]byte(config.JWTSecret))
-	if err != nil {
-		return "", err
-	}
-	return accessToken, nil
-}
-
-func generateRefreshToken(user model.User) (string, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-	claims["email"] = user.Email
-	claims["id"] = user.ID
-	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-	accessToken, err := token.SignedString([]byte(config.JWTSecret))
-	if err != nil {
-		return "", err
-	}
-	return accessToken, nil
 }
 
 func Login(c *fiber.Ctx) error {
@@ -71,7 +44,7 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	accessToken, err := generateAccessToken(user)
+	accessToken, err := utils.GenerateAccessToken(user)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
@@ -80,7 +53,7 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	refreshToken, err := generateRefreshToken(user)
+	refreshToken, err := utils.GenerateRefreshToken(user)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
@@ -144,7 +117,7 @@ func RefreshToken(c *fiber.Ctx) error {
 		})
 	}
 
-	accessToken, err := generateAccessToken(user)
+	accessToken, err := utils.GenerateAccessToken(user)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
@@ -153,7 +126,7 @@ func RefreshToken(c *fiber.Ctx) error {
 		})
 	}
 
-	refreshToken, err := generateRefreshToken(user)
+	refreshToken, err := utils.GenerateRefreshToken(user)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"status":  "error",
