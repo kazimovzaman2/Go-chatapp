@@ -5,12 +5,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/kazimovzaman2/Go-chatapp/database"
 	"github.com/kazimovzaman2/Go-chatapp/model"
 	"github.com/kazimovzaman2/Go-chatapp/utils"
+	"github.com/kazimovzaman2/Go-chatapp/validation"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -108,14 +108,9 @@ func CreateUser(c *fiber.Ctx) error {
 		})
 	}
 
-	// Validate request body
-	validate := validator.New()
-	if err := validate.Struct(user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(model.ErrorResponse{
-			Status:  "error",
-			Message: "Invalid input",
-			Errors:  err.Error(),
-		})
+	userValidationErrors := validation.ValidateUserCredentials(user)
+	if len(userValidationErrors) > 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(userValidationErrors)
 	}
 
 	// Check if email already exists
