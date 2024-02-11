@@ -19,6 +19,14 @@ func hashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
+// GetAllUsers is a handler to get all users
+// @Summary Get all users
+// @Description Get all users
+// @Tags user
+// @Accept json
+// @Produce json
+// @Success 200 {object} model.SuccessResponse
+// @Router /users/ [get]
 func GetAllUsers(c *fiber.Ctx) error {
 	db := database.DB
 	var users []model.User
@@ -36,6 +44,16 @@ func GetAllUsers(c *fiber.Ctx) error {
 	})
 }
 
+// GetUser is a handler to get a user by ID
+// @Summary Get a user by ID
+// @Description Get a user by ID
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} model.SuccessResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Router /users/{id} [get]
 func GetUser(c *fiber.Ctx) error {
 	id := c.Params("id")
 	db := database.DB
@@ -59,6 +77,17 @@ func GetUser(c *fiber.Ctx) error {
 	})
 }
 
+// CreateUser is a handler to create a new user
+// @Summary Create a new user
+// @Description Create a new user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param user body model.User true "Create user"
+// @Success 201 {object} model.SuccessResponse
+// @Failure 400 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /users/ [post]
 func CreateUser(c *fiber.Ctx) error {
 	type NewUser struct {
 		Email        string `json:"email"`
@@ -161,6 +190,16 @@ func CreateUser(c *fiber.Ctx) error {
 	})
 }
 
+// GetMe is a handler to get the current user
+// @Summary Get the current user
+// @Description Get the current user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} model.SuccessResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Router /users/me/ [get]
 func GetMe(c *fiber.Ctx) error {
 	user_claim := c.Locals("user").(*jwt.Token)
 	claims := user_claim.Claims.(jwt.MapClaims)
@@ -185,6 +224,19 @@ func GetMe(c *fiber.Ctx) error {
 	})
 }
 
+// UpdateMe is a handler to update the current user
+// @Summary Update the current user
+// @Description Update the current user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param user body model.User true "User data"
+// @Success 200 {object} model.SuccessResponse
+// @Failure 400 {object} model.ErrorResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /users/me/ [patch]
 func UpdateMe(c *fiber.Ctx) error {
 	user_claim := c.Locals("user").(*jwt.Token)
 	claims := user_claim.Claims.(jwt.MapClaims)
@@ -241,6 +293,17 @@ func UpdateMe(c *fiber.Ctx) error {
 	})
 }
 
+// DeleteMe is a handler to delete the current user
+// @Summary Delete the current user
+// @Description Delete the current user
+// @Tags user
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} model.SuccessResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /users/me/ [delete]
 func DeleteMe(c *fiber.Ctx) error {
 	user_claim := c.Locals("user").(*jwt.Token)
 	claims := user_claim.Claims.(jwt.MapClaims)

@@ -27,6 +27,19 @@ func generateTokens(user model.User) (string, string, error) {
 	return accessToken, refreshToken, nil
 }
 
+// Login is a handler to login a user and return the access and refresh tokens
+// @Summary Login a user
+// @Description Login a user
+// @Tags jwt
+// @Accept json
+// @Produce json
+// @Param input body model.LoginInput true "Login input"
+// @Success 200 {object} model.SuccessResponse
+// @Failure 400 {object} model.ErrorResponse
+// @Failure 401 {object} model.ErrorResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /jwt/create/ [post]
 func Login(c *fiber.Ctx) error {
 	db := database.DB
 	var user model.User
@@ -77,12 +90,21 @@ func Login(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(successResp)
 }
 
+// RefreshToken is a handler to refresh the access token using the refresh token
+// @Summary Refresh token
+// @Description Refresh token
+// @Tags jwt
+// @Accept json
+// @Produce json
+// @Param input body model.RefreshTokenInput true "Refresh token input"
+// @Success 200 {object} model.SuccessResponse
+// @Failure 400 {object} model.ErrorResponse
+// @Failure 401 {object} model.ErrorResponse
+// @Failure 404 {object} model.ErrorResponse
+// @Failure 500 {object} model.ErrorResponse
+// @Router /jwt/refresh/ [post]
 func RefreshToken(c *fiber.Ctx) error {
-	type RefreshTokenInput struct {
-		RefreshToken string `json:"refresh_token"`
-	}
-
-	var input RefreshTokenInput
+	var input model.RefreshTokenInput
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(model.ErrorResponse{
 			Status:  "error",

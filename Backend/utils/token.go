@@ -15,7 +15,7 @@ func GenerateAccessToken(user model.User) (string, error) {
 	claims := token.Claims.(jwt.MapClaims)
 	claims["email"] = user.Email
 	claims["id"] = user.ID
-	claims["exp"] = time.Now().Add(time.Second * 15).Unix()
+	claims["exp"] = time.Now().Add(time.Minute * 15).Unix()
 
 	accessToken, err := token.SignedString([]byte(config.JwtAccessSecret))
 	if err != nil {

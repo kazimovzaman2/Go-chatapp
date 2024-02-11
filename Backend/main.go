@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/kazimovzaman2/Go-chatapp/config"
 	"github.com/kazimovzaman2/Go-chatapp/database"
+	_ "github.com/kazimovzaman2/Go-chatapp/docs"
 	"github.com/kazimovzaman2/Go-chatapp/router"
 )
 
@@ -20,6 +21,18 @@ func init() {
 	database.ConnectDB(&config)
 }
 
+// @title Chat App API
+// @version 1.0
+// @description This is a simple chat app API
+
+// @contact.name Zaman Kazimov
+// @contact.email kazimovzaman2@gmail.com
+
+// @license.name GPlv3
+// @license.url https://www.gnu.org/licenses/gpl-3.0.en.html
+
+// @BasePath /api
+// @host localhost:8000
 func main() {
 	app := fiber.New(fiber.Config{
 		Prefork:       true,

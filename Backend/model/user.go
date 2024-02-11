@@ -1,8 +1,6 @@
 package model
 
-import (
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
@@ -26,4 +24,8 @@ type UserResponse struct {
 type LoginInput struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
+}
+
+type RefreshTokenInput struct {
+	RefreshToken string `json:"refresh_token"`
 }

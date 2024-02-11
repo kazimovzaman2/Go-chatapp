@@ -1,0 +1,307 @@
+basePath: /api
+definitions:
+  model.ErrorResponse:
+    properties:
+      errors: {}
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  model.LoginInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  model.RefreshTokenInput:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  model.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  model.User:
+    properties:
+      email:
+        description: gorm.Model
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        maxLength: 50
+        minLength: 6
+        type: string
+      profile_image:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: kazimovzaman2@gmail.com
+    name: Zaman Kazimov
+  description: This is a simple chat app API
+  license:
+    name: GPlv3
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  title: Chat App API
+  version: "1.0"
+paths:
+  /hello/:
+    get:
+      consumes:
+      - application/json
+      description: Get Hello, World!
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+      summary: Hello, World!
+      tags:
+      - hello
+  /jwt/create/:
+    post:
+      consumes:
+      - application/json
+      description: Login a user
+      parameters:
+      - description: Login input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Login a user
+      tags:
+      - jwt
+  /jwt/refresh/:
+    post:
+      consumes:
+      - application/json
+      description: Refresh token
+      parameters:
+      - description: Refresh token input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.RefreshTokenInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Refresh token
+      tags:
+      - jwt
+  /users/:
+    get:
+      consumes:
+      - application/json
+      description: Get all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+      summary: Get all users
+      tags:
+      - user
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      parameters:
+      - description: Create user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Create a new user
+      tags:
+      - user
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get a user by ID
+      tags:
+      - user
+  /users/me/:
+    delete:
+      consumes:
+      - application/json
+      description: Delete the current user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete the current user
+      tags:
+      - user
+    get:
+      consumes:
+      - application/json
+      description: Get the current user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get the current user
+      tags:
+      - user
+    patch:
+      consumes:
+      - application/json
+      description: Update the current user
+      parameters:
+      - description: User data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update the current user
+      tags:
+      - user
+swagger: "2.0"
