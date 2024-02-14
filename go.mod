@@ -8,7 +8,6 @@ require (
 	github.com/gofiber/fiber/v2 v2.52.0
 	github.com/gofiber/swagger v1.0.0
 	github.com/golang-jwt/jwt/v5 v5.2.0
-	github.com/kazimovzaman2/Go-chatapp v0.0.0-20240214153058-de36fe44f545
 	github.com/spf13/viper v1.18.2
 	github.com/swaggo/swag v1.16.3
 	golang.org/x/crypto v0.19.0
