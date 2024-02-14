@@ -3,10 +3,10 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/kazimovzaman2/Go-chatapp/config"
-	"github.com/kazimovzaman2/Go-chatapp/database"
-	"github.com/kazimovzaman2/Go-chatapp/model"
-	"github.com/kazimovzaman2/Go-chatapp/utils"
+	"github.com/kazimovzaman2/Go-jwt-gorm/config"
+	"github.com/kazimovzaman2/Go-jwt-gorm/database"
+	"github.com/kazimovzaman2/Go-jwt-gorm/model"
+	"github.com/kazimovzaman2/Go-jwt-gorm/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 

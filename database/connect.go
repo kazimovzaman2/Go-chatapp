@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/kazimovzaman2/Go-chatapp/config"
-	"github.com/kazimovzaman2/Go-chatapp/model"
+	"github.com/kazimovzaman2/Go-jwt-gorm/config"
+	"github.com/kazimovzaman2/Go-jwt-gorm/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

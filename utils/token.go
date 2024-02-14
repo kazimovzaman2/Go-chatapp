@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/kazimovzaman2/Go-chatapp/config"
-	"github.com/kazimovzaman2/Go-chatapp/model"
+	"github.com/kazimovzaman2/Go-jwt-gorm/config"
+	"github.com/kazimovzaman2/Go-jwt-gorm/model"
 )
 
 func GenerateAccessToken(user model.User) (string, error) {

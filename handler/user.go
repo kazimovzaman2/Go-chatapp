@@ -7,10 +7,10 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/kazimovzaman2/Go-chatapp/database"
-	"github.com/kazimovzaman2/Go-chatapp/model"
-	"github.com/kazimovzaman2/Go-chatapp/utils"
-	"github.com/kazimovzaman2/Go-chatapp/validation"
+	"github.com/kazimovzaman2/Go-jwt-gorm/database"
+	"github.com/kazimovzaman2/Go-jwt-gorm/model"
+	"github.com/kazimovzaman2/Go-jwt-gorm/utils"
+	"github.com/kazimovzaman2/Go-jwt-gorm/validation"
 	"golang.org/x/crypto/bcrypt"
 )
 

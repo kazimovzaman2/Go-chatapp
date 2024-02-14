@@ -2,7 +2,7 @@ package validation
 
 import (
 	"github.com/go-playground/validator/v10"
-	"github.com/kazimovzaman2/Go-chatapp/model"
+	"github.com/kazimovzaman2/Go-jwt-gorm/model"
 )
 
 func ValidateUserCredentials(user *model.User) []*model.ErrorResponse {

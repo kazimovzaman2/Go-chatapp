@@ -6,10 +6,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/kazimovzaman2/Go-chatapp/config"
-	"github.com/kazimovzaman2/Go-chatapp/database"
-	_ "github.com/kazimovzaman2/Go-chatapp/docs"
-	"github.com/kazimovzaman2/Go-chatapp/router"
+	"github.com/kazimovzaman2/Go-jwt-gorm/config"
+	"github.com/kazimovzaman2/Go-jwt-gorm/database"
+	_ "github.com/kazimovzaman2/Go-jwt-gorm/docs"
+	"github.com/kazimovzaman2/Go-jwt-gorm/router"
 )
 
 func init() {
@@ -21,9 +21,9 @@ func init() {
 	database.ConnectDB(&config)
 }
 
-// @title Chat App API
+// @title App API
 // @version 1.0
-// @description This is a simple chat app API
+// @description This is a simple app API
 
 // @contact.name Zaman Kazimov
 // @contact.email kazimovzaman2@gmail.com
@@ -39,7 +39,7 @@ func main() {
 		CaseSensitive: true,
 		StrictRouting: true,
 		ServerHeader:  "Fiber",
-		AppName:       "Chat App",
+		AppName:       "App",
 	})
 
 	app.Use(logger.New())

@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a simple chat app API",
-        "title": "Chat App API",
+        "description": "This is a simple app API",
+        "title": "App API",
         "contact": {
             "name": "Zaman Kazimov",
             "email": "kazimovzaman2@gmail.com"

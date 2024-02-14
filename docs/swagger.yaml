@@ -57,11 +57,11 @@ info:
   contact:
     email: kazimovzaman2@gmail.com
     name: Zaman Kazimov
-  description: This is a simple chat app API
+  description: This is a simple app API
   license:
     name: GPlv3
     url: https://www.gnu.org/licenses/gpl-3.0.en.html
-  title: Chat App API
+  title: App API
   version: "1.0"
 paths:
   /hello/:

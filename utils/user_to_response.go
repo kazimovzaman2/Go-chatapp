@@ -1,6 +1,6 @@
 package utils
 
-import "github.com/kazimovzaman2/Go-chatapp/model"
+import "github.com/kazimovzaman2/Go-jwt-gorm/model"
 
 func UserToResponse(user model.User) model.UserResponse {
 	return model.UserResponse{

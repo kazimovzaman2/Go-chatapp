@@ -3,9 +3,9 @@ package router
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
-	"github.com/kazimovzaman2/Go-chatapp/config"
-	"github.com/kazimovzaman2/Go-chatapp/handler"
-	"github.com/kazimovzaman2/Go-chatapp/middleware"
+	"github.com/kazimovzaman2/Go-jwt-gorm/config"
+	"github.com/kazimovzaman2/Go-jwt-gorm/handler"
+	"github.com/kazimovzaman2/Go-jwt-gorm/middleware"
 )
 
 func SetupRoutes(app *fiber.App) {
